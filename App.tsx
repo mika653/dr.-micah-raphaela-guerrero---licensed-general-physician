@@ -1,17 +1,18 @@
 
-import React, { useState, useEffect } from 'react';
-import { 
-  ArrowRight, 
-  MapPin, 
-  Clock, 
-  Phone, 
-  Mail, 
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  ArrowRight,
+  MapPin,
+  Clock,
+  Phone,
+  Mail,
   ExternalLink,
   ShieldCheck,
   CalendarCheck,
   Wallet,
   Quote,
-  Loader2
+  Loader2,
+  Sparkles
 } from 'lucide-react';
 import { GoogleGenAI } from "@google/genai";
 import { DOCTOR_INFO, SERVICES, PAYMENT_METHODS, TESTIMONIALS } from './constants';
@@ -27,6 +28,26 @@ declare global {
     aistudio: AIStudio;
   }
 }
+
+const useScrollReveal = () => {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { el.classList.add('revealed'); observer.unobserve(el); } },
+      { threshold: 0.15 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+  return ref;
+};
+
+const ScrollReveal: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = '' }) => {
+  const ref = useScrollReveal();
+  return <div ref={ref} className={`scroll-reveal ${className}`}>{children}</div>;
+};
 
 const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -203,56 +224,81 @@ const App: React.FC = () => {
       <Navbar />
 
       {/* Hero Section */}
-      <Section className="pt-32 md:pt-48 pb-16 md:pb-24 overflow-hidden relative" bgColor="bg-slate-50">
-        <div className="relative z-10 flex flex-col items-center text-center max-w-4xl mx-auto">
-          <div className="flex items-center gap-3 px-4 py-2 mb-8 bg-white border border-slate-200 rounded-full shadow-sm animate-fade-in">
-            <div className="w-8 h-8 rounded-full overflow-hidden border border-teal-100">
-               {/* Hero image is above the fold, so we load it eagerly for better LCP */}
-               <img src={doctorPhotoUrl} alt="Dr. Micah Profile" className="w-full h-full object-cover" loading="eager" />
+      <section className="relative pt-28 md:pt-40 pb-20 md:pb-32 overflow-hidden bg-gradient-to-br from-slate-50 via-white to-teal-50/40">
+        <div className="max-w-6xl mx-auto px-6 relative z-10">
+          <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-center">
+            {/* Left: Text */}
+            <div className="order-2 md:order-1">
+              <div className="flex items-center gap-2 px-4 py-2 mb-8 bg-amber-50 border border-amber-200/60 rounded-full w-fit shadow-sm animate-fade-up">
+                <Sparkles size={14} className="text-amber-500" />
+                <span className="text-amber-700 text-xs font-bold uppercase tracking-widest">Licensed General Physician</span>
+              </div>
+
+              <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl font-bold text-slate-900 mb-6 leading-[1.1] tracking-tight animate-fade-up-delay-1">
+                {DOCTOR_INFO.name}
+              </h1>
+              <p className="text-xl md:text-2xl text-slate-500 mb-10 leading-relaxed font-light max-w-lg animate-fade-up-delay-2">
+                {DOCTOR_INFO.tagline}
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 animate-fade-up-delay-3">
+                <a
+                  href={DOCTOR_INFO.bookingLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-10 py-5 bg-teal-600 hover:bg-teal-700 text-white rounded-2xl font-bold text-lg transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+                >
+                  Schedule a Consultation
+                  <ArrowRight size={22} />
+                </a>
+                <a
+                  href="#about"
+                  className="px-10 py-5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-2xl font-bold text-lg transition-all flex items-center justify-center"
+                >
+                  Learn More
+                </a>
+              </div>
             </div>
-            <span className="text-teal-700 text-sm font-semibold">Licensed General Physician</span>
-          </div>
-          
-          <h1 className="text-5xl md:text-7xl font-bold text-slate-900 mb-6 leading-tight tracking-tight">
-            {DOCTOR_INFO.name}
-          </h1>
-          <p className="text-xl md:text-2xl text-slate-600 mb-12 leading-relaxed font-light max-w-2xl">
-            {DOCTOR_INFO.tagline}
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-            <a 
-              href={DOCTOR_INFO.bookingLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-10 py-5 bg-teal-600 hover:bg-teal-700 text-white rounded-2xl font-bold text-lg transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
-            >
-              Schedule a Consultation
-              <ArrowRight size={22} />
-            </a>
-            <a 
-              href="#about"
-              className="px-10 py-5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-2xl font-bold text-lg transition-all flex items-center justify-center"
-            >
-              Learn More
-            </a>
+
+            {/* Right: Portrait */}
+            <div className="relative order-1 md:order-2 flex justify-center animate-fade-up">
+              <div className="relative">
+                <div className="w-72 h-72 md:w-[360px] md:h-[360px] lg:w-[420px] lg:h-[420px] rounded-full overflow-hidden border-4 border-white shadow-2xl ring-1 ring-slate-200/50">
+                  <img src={doctorPhotoUrl} alt={DOCTOR_INFO.name} className="w-full h-full object-cover" loading="eager" />
+                </div>
+                {/* Decorative gold ring */}
+                <div className="absolute -inset-3 rounded-full border-2 border-dashed border-amber-300/40 pointer-events-none"></div>
+                {/* Floating badge */}
+                <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-white px-6 py-3 rounded-full shadow-xl border border-slate-100 flex items-center gap-2">
+                  <div className="w-2.5 h-2.5 bg-teal-500 rounded-full animate-pulse"></div>
+                  <span className="text-sm font-bold text-slate-700 whitespace-nowrap">Accepting Patients</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-        <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-[600px] h-[600px] bg-teal-100/30 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
-        <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-blue-100/30 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
-      </Section>
+
+        {/* Background decorations */}
+        <div className="absolute top-0 right-0 -translate-y-1/3 translate-x-1/4 w-[700px] h-[700px] bg-teal-100/25 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="absolute bottom-0 left-0 translate-y-1/3 -translate-x-1/4 w-[500px] h-[500px] bg-amber-100/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-radial from-teal-50/40 to-transparent rounded-full blur-2xl pointer-events-none"></div>
+      </section>
 
       {/* About Section */}
       <Section id="about">
+        <ScrollReveal>
         <div className="grid md:grid-cols-2 gap-16 md:gap-24 items-center">
           <div className="order-2 md:order-1">
-            <div className="w-16 h-1.5 bg-teal-600 mb-10 rounded-full"></div>
-            <h2 className="text-4xl font-bold text-slate-900 mb-8 tracking-tight">Patient-First Medical Care</h2>
+            <div className="flex items-center gap-2 mb-10">
+              <div className="w-12 h-1 bg-teal-600 rounded-full"></div>
+              <div className="w-4 h-1 bg-amber-400 rounded-full"></div>
+            </div>
+            <h2 className="font-serif text-4xl md:text-5xl font-bold text-slate-900 mb-8 tracking-tight">Patient-First Medical Care</h2>
             <p className="text-lg text-slate-600 leading-relaxed mb-10 font-light">
               {DOCTOR_INFO.bio}
             </p>
             <div className="space-y-6">
               <div className="flex items-start gap-5">
-                <div className="p-3 bg-teal-50 rounded-2xl text-teal-600 shadow-sm border border-teal-100/50">
+                <div className="p-3 bg-amber-50 rounded-2xl text-amber-600 shadow-sm border border-amber-100/50">
                   <ShieldCheck size={24} />
                 </div>
                 <div>
@@ -271,64 +317,72 @@ const App: React.FC = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="relative order-1 md:order-2">
              <div className="aspect-[4/5] rounded-[2rem] bg-slate-100 overflow-hidden shadow-2xl border-4 border-white">
-                <img 
-                  src={doctorPhotoUrl} 
-                  alt={DOCTOR_INFO.name} 
+                <img
+                  src={doctorPhotoUrl}
+                  alt={DOCTOR_INFO.name}
                   loading="lazy"
                   className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-700"
                 />
              </div>
              <div className="absolute -bottom-8 -right-8 bg-white p-8 rounded-3xl shadow-2xl border border-slate-100 hidden lg:block max-w-[240px]">
                 <div className="flex items-center gap-3 mb-3">
-                   <div className="w-3 h-3 bg-teal-500 rounded-full animate-pulse"></div>
+                   <div className="w-3 h-3 bg-amber-400 rounded-full animate-pulse"></div>
                    <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">General Medicine</p>
                 </div>
-                <p className="text-xl font-bold text-slate-900 leading-snug">Compassionate & Evidence-Based Care</p>
+                <p className="font-serif text-xl font-bold text-slate-900 leading-snug">Compassionate & Evidence-Based Care</p>
              </div>
           </div>
         </div>
+        </ScrollReveal>
       </Section>
 
       {/* Services Section */}
       <Section id="services" bgColor="bg-slate-50">
+        <ScrollReveal>
         <div className="text-center mb-20">
-          <h2 className="text-4xl font-bold text-slate-900 mb-5 tracking-tight">Comprehensive Services</h2>
+          <h2 className="font-serif text-4xl md:text-5xl font-bold text-slate-900 mb-5 tracking-tight">Comprehensive Services</h2>
           <p className="text-slate-500 max-w-2xl mx-auto text-lg font-light">Dedicated to providing reliable primary care and diagnostic support for your everyday health needs.</p>
         </div>
+        </ScrollReveal>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {SERVICES.map((service, idx) => (
-            <div key={idx} className="bg-white p-10 rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 group hover:-translate-y-1">
+            <ScrollReveal key={idx}>
+            <div className="bg-white p-10 rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 group hover:-translate-y-1 h-full">
               <div className="w-14 h-14 bg-teal-50 text-teal-600 rounded-2xl flex items-center justify-center mb-8 group-hover:bg-teal-600 group-hover:text-white transition-colors duration-300">
                 {service.icon}
               </div>
               <h3 className="text-2xl font-bold text-slate-900 mb-4">{service.title}</h3>
               <p className="text-slate-500 leading-relaxed font-light">{service.description}</p>
             </div>
+            </ScrollReveal>
           ))}
         </div>
       </Section>
 
       {/* Testimonials Section */}
       <Section id="testimonials">
+        <ScrollReveal>
         <div className="text-center mb-20">
-          <h2 className="text-4xl font-bold text-slate-900 mb-5 tracking-tight">Patient Experiences</h2>
+          <h2 className="font-serif text-4xl md:text-5xl font-bold text-slate-900 mb-5 tracking-tight">Patient Experiences</h2>
           <p className="text-slate-500 text-lg font-light">Reflecting our commitment to patient-centered, compassionate care.</p>
         </div>
+        </ScrollReveal>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
           {TESTIMONIALS.map((testimonial, idx) => (
-            <div key={idx} className="bg-white p-10 rounded-[2rem] border border-slate-100 relative pt-14 flex flex-col h-full shadow-sm">
-              <div className="absolute top-0 left-10 -translate-y-1/2 p-4 bg-teal-600 text-white rounded-2xl shadow-xl">
+            <ScrollReveal key={idx}>
+            <div className="bg-white p-10 rounded-[2rem] border border-slate-100 relative pt-14 flex flex-col h-full shadow-sm">
+              <div className="absolute top-0 left-10 -translate-y-1/2 p-4 bg-amber-500 text-white rounded-2xl shadow-xl">
                 <Quote size={24} fill="currentColor" />
               </div>
-              <p className="text-slate-600 italic leading-relaxed mb-8 flex-grow text-lg">"{testimonial.text}"</p>
+              <p className="text-slate-600 italic leading-relaxed mb-8 flex-grow text-lg font-serif">"{testimonial.text}"</p>
               <div className="mb-8 border-t border-slate-50 pt-6">
                 <p className="font-bold text-slate-900 text-lg">{testimonial.author}</p>
-                <p className="text-teal-600 text-xs font-bold uppercase tracking-widest mt-1">{testimonial.detail}</p>
+                <p className="text-amber-600 text-xs font-bold uppercase tracking-widest mt-1">{testimonial.detail}</p>
               </div>
-              <a 
+              <a
                 href={DOCTOR_INFO.bookingLink}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -338,12 +392,14 @@ const App: React.FC = () => {
                 Book Appointment
               </a>
             </div>
+            </ScrollReveal>
           ))}
         </div>
       </Section>
 
       {/* Clinic Info Grid */}
       <Section id="clinic-info" bgColor="bg-slate-50">
+        <ScrollReveal>
         <div className="grid md:grid-cols-3 gap-10">
           <ClinicLocationCard />
 
@@ -351,7 +407,7 @@ const App: React.FC = () => {
             <div className="w-16 h-16 bg-teal-50 text-teal-600 rounded-full flex items-center justify-center mb-8">
               <Clock size={28} />
             </div>
-            <h3 className="text-2xl font-bold mb-3">Clinic Hours</h3>
+            <h3 className="font-serif text-2xl font-bold mb-3">Clinic Hours</h3>
             <p className="text-slate-500 mb-1 font-medium">Monday to Friday</p>
             <p className="text-slate-900 font-bold text-3xl mb-10">8 AM – 5 PM</p>
             
@@ -368,7 +424,7 @@ const App: React.FC = () => {
             <div className="w-16 h-16 bg-teal-50 text-teal-600 rounded-full flex items-center justify-center mb-8">
               <Wallet size={28} />
             </div>
-            <h3 className="text-2xl font-bold mb-3">Consultation Rate</h3>
+            <h3 className="font-serif text-2xl font-bold mb-3">Consultation Rate</h3>
             <p className="text-slate-500 mb-2 font-light uppercase tracking-widest">Base Consultation Fee</p>
             <p className="text-slate-900 font-bold text-5xl mb-10">{DOCTOR_INFO.consultationFee}</p>
             
@@ -383,12 +439,14 @@ const App: React.FC = () => {
             </div>
           </div>
         </div>
+        </ScrollReveal>
       </Section>
 
       {/* Appointment Booking CTA */}
       <Section bgColor="bg-slate-900" className="text-white relative overflow-hidden">
+        <ScrollReveal>
         <div className="max-w-4xl mx-auto text-center relative z-10">
-          <h2 className="text-4xl md:text-5xl font-bold mb-8 tracking-tight">Secure your consultation today.</h2>
+          <h2 className="font-serif text-4xl md:text-5xl font-bold mb-8 tracking-tight">Secure your consultation today.</h2>
           <p className="text-slate-300 text-xl mb-12 leading-relaxed font-light">
             Dr. Micah utilizes SeriousMD for all medical bookings, ensuring your personal health information remains confidential and your slot is guaranteed.
           </p>
@@ -405,14 +463,16 @@ const App: React.FC = () => {
             Verified Healthcare Professional &middot; SeriousMD Integrated
           </p>
         </div>
+        </ScrollReveal>
         <div className="absolute top-0 left-1/4 w-[700px] h-[700px] bg-teal-500/10 rounded-full blur-[140px] -translate-y-1/2 pointer-events-none"></div>
       </Section>
 
       {/* Contact Section */}
       <Section id="contact" className="pb-32">
+        <ScrollReveal>
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-slate-900 mb-5 tracking-tight">Get in Touch</h2>
+            <h2 className="font-serif text-4xl md:text-5xl font-bold text-slate-900 mb-5 tracking-tight">Get in Touch</h2>
             <p className="text-slate-500 text-lg font-light">For specific inquiries or medical documentation follow-ups.</p>
           </div>
           <div className="grid md:grid-cols-2 gap-8">
@@ -442,6 +502,7 @@ const App: React.FC = () => {
             </a>
           </div>
         </div>
+        </ScrollReveal>
       </Section>
 
       {/* Footer */}
@@ -453,7 +514,7 @@ const App: React.FC = () => {
                   <img src={doctorPhotoUrl} alt="Dr. Micah Small" loading="lazy" className="w-full h-full object-cover" />
                </div>
                <div>
-                 <h3 className="text-2xl font-bold text-slate-900 leading-tight">{DOCTOR_INFO.name}</h3>
+                 <h3 className="font-serif text-2xl font-bold text-slate-900 leading-tight">{DOCTOR_INFO.name}</h3>
                  <p className="text-slate-500 font-medium">{DOCTOR_INFO.title}</p>
                </div>
             </div>
