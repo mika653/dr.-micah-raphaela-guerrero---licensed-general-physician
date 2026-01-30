@@ -1,0 +1,8 @@
+
+{
+  "name": "Dr. Micah Raphaela Guerrero - Licensed General Physician",
+  "description": "Professional InstaSite for Dr. Micah Raphaela Guerrero, offering evidence-based and holistic medical care.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
