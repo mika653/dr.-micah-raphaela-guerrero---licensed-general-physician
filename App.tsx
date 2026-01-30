@@ -239,14 +239,14 @@ const App: React.FC = () => {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="relative pt-28 md:pt-40 pb-20 md:pb-32 overflow-hidden bg-gradient-to-br from-slate-50 via-white to-teal-50/40 bg-grain">
+      <section className="relative pt-28 md:pt-36 pb-20 md:pb-28 overflow-hidden bg-gradient-to-br from-teal-50 via-white to-teal-100/50 bg-grain">
         <div className="max-w-6xl mx-auto px-6 relative z-10">
-          <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-center">
+          <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
             {/* Left: Text */}
             <div className="order-2 md:order-1">
-              <div className="flex items-center gap-2 px-4 py-2 mb-8 bg-amber-50 border border-amber-200/60 rounded-full w-fit shadow-sm animate-fade-up">
+              <div className="flex items-center gap-2 px-4 py-2 mb-8 bg-white/70 backdrop-blur border border-teal-200/40 rounded-full w-fit shadow-sm animate-fade-up">
                 <Sparkles size={14} className="text-amber-500" />
-                <span className="text-amber-700 text-xs font-bold uppercase tracking-widest">Licensed General Physician</span>
+                <span className="text-teal-700 text-xs font-bold uppercase tracking-widest">Licensed General Physician</span>
               </div>
 
               <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl font-bold text-slate-900 mb-6 leading-[1.1] tracking-tight animate-fade-up-delay-1">
@@ -267,40 +267,36 @@ const App: React.FC = () => {
                 </a>
                 <a
                   href="#about"
-                  className="px-10 py-5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-2xl font-bold text-lg transition-all flex items-center justify-center"
+                  className="px-10 py-5 bg-white/80 backdrop-blur border border-slate-200 hover:bg-white text-slate-700 rounded-2xl font-bold text-lg transition-all flex items-center justify-center"
                 >
                   Learn More
                 </a>
               </div>
             </div>
 
-            {/* Right: Portrait */}
+            {/* Right: Blended Portrait */}
             <div className="relative order-1 md:order-2 flex justify-center animate-fade-up">
-              <div className="relative w-72 md:w-[360px] lg:w-[420px]">
-                {/* Gradient backdrop shape */}
-                <div className="absolute inset-0 rounded-[2.5rem] bg-gradient-to-br from-teal-500 via-teal-400 to-emerald-300 rotate-3 scale-[1.03] opacity-90 shadow-2xl"></div>
-                <div className="absolute inset-0 rounded-[2.5rem] bg-gradient-to-tr from-white/20 to-transparent rotate-3 scale-[1.03]"></div>
-                {/* Photo */}
-                <div className="relative aspect-[3/4] rounded-[2rem] overflow-hidden shadow-2xl ring-1 ring-white/30">
-                  <img src={doctorPhotoUrl} alt={DOCTOR_INFO.name} className="w-full h-full object-cover" loading="eager" />
-                  {/* Subtle bottom gradient overlay */}
-                  <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-teal-900/20 to-transparent pointer-events-none"></div>
-                </div>
+              <div className="relative w-80 md:w-[400px] lg:w-[460px]">
+                <img
+                  src={doctorPhotoUrl}
+                  alt={DOCTOR_INFO.name}
+                  className="w-full h-auto hero-portrait-blend mix-blend-multiply"
+                  loading="eager"
+                />
                 {/* Floating badge */}
-                <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur px-6 py-3 rounded-2xl shadow-xl border border-slate-100 flex items-center gap-2.5">
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur px-6 py-3 rounded-2xl shadow-xl border border-slate-100 flex items-center gap-2.5">
                   <div className="w-2.5 h-2.5 bg-teal-500 rounded-full animate-pulse"></div>
                   <span className="text-sm font-bold text-slate-700 whitespace-nowrap">Accepting Patients</span>
                 </div>
-                {/* Small decorative accent */}
-                <div className="absolute -top-3 -right-3 w-16 h-16 border-2 border-amber-300/40 rounded-xl rotate-12 pointer-events-none"></div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Background decorations */}
-        <div className="absolute top-0 right-0 -translate-y-1/3 translate-x-1/4 w-[700px] h-[700px] bg-teal-100/25 rounded-full blur-3xl pointer-events-none"></div>
-        <div className="absolute bottom-0 left-0 translate-y-1/3 -translate-x-1/4 w-[500px] h-[500px] bg-amber-100/20 rounded-full blur-3xl pointer-events-none"></div>
+        {/* Background accents */}
+        <div className="absolute top-1/4 right-0 w-[500px] h-[500px] bg-teal-200/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="absolute bottom-0 left-1/4 w-[400px] h-[400px] bg-teal-100/30 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="absolute top-0 left-0 w-[300px] h-[300px] bg-amber-50/40 rounded-full blur-3xl pointer-events-none"></div>
 
         <WaveDivider fill="white" variant={1} />
       </section>
