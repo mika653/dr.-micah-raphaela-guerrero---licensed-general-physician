@@ -49,6 +49,21 @@ const ScrollReveal: React.FC<{ children: React.ReactNode; className?: string }> 
   return <div ref={ref} className={`scroll-reveal ${className}`}>{children}</div>;
 };
 
+const WaveDivider: React.FC<{ fill?: string; flip?: boolean; variant?: 1 | 2 | 3 }> = ({ fill = "white", flip = false, variant = 1 }) => {
+  const paths = {
+    1: "M0,32 C360,48 720,0 1080,24 C1260,36 1380,48 1440,40 L1440,48 L0,48 Z",
+    2: "M0,20 C240,44 480,4 720,28 C960,52 1200,8 1440,32 L1440,48 L0,48 Z",
+    3: "M0,36 C180,12 420,44 660,20 C900,-4 1140,36 1440,16 L1440,48 L0,48 Z",
+  };
+  return (
+    <div className={`wave-divider ${flip ? 'wave-divider-top rotate-180' : 'wave-divider-bottom'}`}>
+      <svg viewBox="0 0 1440 48" preserveAspectRatio="none" fill={fill}>
+        <path d={paths[variant]} />
+      </svg>
+    </div>
+  );
+};
+
 const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -82,9 +97,9 @@ const Navbar: React.FC = () => {
   );
 };
 
-const Section: React.FC<{ children: React.ReactNode; id?: string; className?: string; bgColor?: string }> = ({ children, id, className, bgColor = "bg-white" }) => (
-  <section id={id} className={`py-20 md:py-32 ${bgColor} ${className}`}>
-    <div className="max-w-6xl mx-auto px-6">
+const Section: React.FC<{ children: React.ReactNode; id?: string; className?: string; bgColor?: string; texture?: string }> = ({ children, id, className, bgColor = "bg-white", texture = "" }) => (
+  <section id={id} className={`py-20 md:py-32 relative ${bgColor} ${texture} ${className}`}>
+    <div className="max-w-6xl mx-auto px-6 relative z-[3]">
       {children}
     </div>
   </section>
@@ -224,7 +239,7 @@ const App: React.FC = () => {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="relative pt-28 md:pt-40 pb-20 md:pb-32 overflow-hidden bg-gradient-to-br from-slate-50 via-white to-teal-50/40">
+      <section className="relative pt-28 md:pt-40 pb-20 md:pb-32 overflow-hidden bg-gradient-to-br from-slate-50 via-white to-teal-50/40 bg-grain">
         <div className="max-w-6xl mx-auto px-6 relative z-10">
           <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-center">
             {/* Left: Text */}
@@ -261,17 +276,23 @@ const App: React.FC = () => {
 
             {/* Right: Portrait */}
             <div className="relative order-1 md:order-2 flex justify-center animate-fade-up">
-              <div className="relative">
-                <div className="w-72 h-72 md:w-[360px] md:h-[360px] lg:w-[420px] lg:h-[420px] rounded-full overflow-hidden border-4 border-white shadow-2xl ring-1 ring-slate-200/50">
+              <div className="relative w-72 md:w-[360px] lg:w-[420px]">
+                {/* Gradient backdrop shape */}
+                <div className="absolute inset-0 rounded-[2.5rem] bg-gradient-to-br from-teal-500 via-teal-400 to-emerald-300 rotate-3 scale-[1.03] opacity-90 shadow-2xl"></div>
+                <div className="absolute inset-0 rounded-[2.5rem] bg-gradient-to-tr from-white/20 to-transparent rotate-3 scale-[1.03]"></div>
+                {/* Photo */}
+                <div className="relative aspect-[3/4] rounded-[2rem] overflow-hidden shadow-2xl ring-1 ring-white/30">
                   <img src={doctorPhotoUrl} alt={DOCTOR_INFO.name} className="w-full h-full object-cover" loading="eager" />
+                  {/* Subtle bottom gradient overlay */}
+                  <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-teal-900/20 to-transparent pointer-events-none"></div>
                 </div>
-                {/* Decorative gold ring */}
-                <div className="absolute -inset-3 rounded-full border-2 border-dashed border-amber-300/40 pointer-events-none"></div>
                 {/* Floating badge */}
-                <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-white px-6 py-3 rounded-full shadow-xl border border-slate-100 flex items-center gap-2">
+                <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur px-6 py-3 rounded-2xl shadow-xl border border-slate-100 flex items-center gap-2.5">
                   <div className="w-2.5 h-2.5 bg-teal-500 rounded-full animate-pulse"></div>
                   <span className="text-sm font-bold text-slate-700 whitespace-nowrap">Accepting Patients</span>
                 </div>
+                {/* Small decorative accent */}
+                <div className="absolute -top-3 -right-3 w-16 h-16 border-2 border-amber-300/40 rounded-xl rotate-12 pointer-events-none"></div>
               </div>
             </div>
           </div>
@@ -280,10 +301,11 @@ const App: React.FC = () => {
         {/* Background decorations */}
         <div className="absolute top-0 right-0 -translate-y-1/3 translate-x-1/4 w-[700px] h-[700px] bg-teal-100/25 rounded-full blur-3xl pointer-events-none"></div>
         <div className="absolute bottom-0 left-0 translate-y-1/3 -translate-x-1/4 w-[500px] h-[500px] bg-amber-100/20 rounded-full blur-3xl pointer-events-none"></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-radial from-teal-50/40 to-transparent rounded-full blur-2xl pointer-events-none"></div>
+
+        <WaveDivider fill="white" variant={1} />
       </section>
 
-      {/* About Section */}
+      {/* About Section — white bg, no texture for contrast */}
       <Section id="about">
         <ScrollReveal>
         <div className="grid md:grid-cols-2 gap-16 md:gap-24 items-center">
@@ -340,7 +362,9 @@ const App: React.FC = () => {
       </Section>
 
       {/* Services Section */}
-      <Section id="services" bgColor="bg-slate-50">
+      <Section id="services" bgColor="bg-slate-50" texture="bg-dots">
+        <WaveDivider fill="#f8fafc" flip variant={1} />
+        <WaveDivider fill="white" variant={2} />
         <ScrollReveal>
         <div className="text-center mb-20">
           <h2 className="font-serif text-4xl md:text-5xl font-bold text-slate-900 mb-5 tracking-tight">Comprehensive Services</h2>
@@ -350,7 +374,7 @@ const App: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {SERVICES.map((service, idx) => (
             <ScrollReveal key={idx}>
-            <div className="bg-white p-10 rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 group hover:-translate-y-1 h-full">
+            <div className="card-accent bg-white p-10 rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 group hover:-translate-y-1 h-full">
               <div className="w-14 h-14 bg-teal-50 text-teal-600 rounded-2xl flex items-center justify-center mb-8 group-hover:bg-teal-600 group-hover:text-white transition-colors duration-300">
                 {service.icon}
               </div>
@@ -398,7 +422,9 @@ const App: React.FC = () => {
       </Section>
 
       {/* Clinic Info Grid */}
-      <Section id="clinic-info" bgColor="bg-slate-50">
+      <Section id="clinic-info" bgColor="bg-slate-50" texture="bg-dots">
+        <WaveDivider fill="#f8fafc" flip variant={3} />
+        <WaveDivider fill="#0f172a" variant={1} />
         <ScrollReveal>
         <div className="grid md:grid-cols-3 gap-10">
           <ClinicLocationCard />
@@ -443,7 +469,7 @@ const App: React.FC = () => {
       </Section>
 
       {/* Appointment Booking CTA */}
-      <Section bgColor="bg-slate-900" className="text-white relative overflow-hidden">
+      <Section bgColor="bg-slate-900" className="text-white relative overflow-hidden" texture="bg-crosshatch bg-grain">
         <ScrollReveal>
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <h2 className="font-serif text-4xl md:text-5xl font-bold mb-8 tracking-tight">Secure your consultation today.</h2>
@@ -465,6 +491,7 @@ const App: React.FC = () => {
         </div>
         </ScrollReveal>
         <div className="absolute top-0 left-1/4 w-[700px] h-[700px] bg-teal-500/10 rounded-full blur-[140px] -translate-y-1/2 pointer-events-none"></div>
+        <WaveDivider fill="white" variant={3} />
       </Section>
 
       {/* Contact Section */}
@@ -506,8 +533,8 @@ const App: React.FC = () => {
       </Section>
 
       {/* Footer */}
-      <footer className="bg-slate-50 border-t border-slate-200 py-20">
-        <div className="max-w-6xl mx-auto px-6">
+      <footer className="bg-slate-50 border-t border-slate-200 py-20 relative bg-dots">
+        <div className="max-w-6xl mx-auto px-6 relative z-[3]">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-10 mb-16">
             <div className="flex items-center gap-5">
                <div className="w-14 h-14 rounded-2xl overflow-hidden border border-slate-200 shadow-sm">
